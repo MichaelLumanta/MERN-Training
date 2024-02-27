@@ -3,6 +3,8 @@ const express = require("express")
 const LibraryRoutes = express.Router()
 
 const dbo = require("../../db/conn")
+const { get } = require("mongoose")
+
 
 LibraryRoutes.route("/api/getBooks").get(function (req,res){
 
@@ -14,7 +16,9 @@ LibraryRoutes.route("/api/getBooks").get(function (req,res){
         payload:[]
     }   
 
-    db_connect.collection("Library").find({}).toArray(function (err,result){
+    db_connect.collection("Library").find({
+      
+    }).toArray(function (err,result){
         if(err){
             response.message = "Something Went Wrong"
             res.json(response)
@@ -37,19 +41,30 @@ LibraryRoutes.route("/api/storeBooks").post(function (req,res){
         message:"",
         payload:[]
     }   
+    
+
 
     const payload = req.body.payload
 
-    let myObect = {
-        book_name: payload.book_name,
-        author : payload.author
+    if(!payload.book_name || !payload.author){
+        response.message = "Incomplete Data Sent"
+        res.json(response)
+        res.status(400);
+        return
     }
+
+    let myObject = {
+        book_name: payload.book_name,
+        author : payload.author,       
+    }
+
+    console.log(myObject)
 
     let db_connect = dbo.getDb();
     
     // "INSERT INTO LIBRARY (myObject.keys) VALUES (myObject.value)"
     
-    db_connect.collection("Library").insertOne(myObect,function(err,response){
+    db_connect.collection("Library").insertOne(myObject,function(err,response){
         if(err){
             response.message = "Something Went Wrong"
             res.json(response)

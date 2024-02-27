@@ -5,11 +5,8 @@ const AddEditLibrary = (props) =>{
     const {
         form,
         updateForm,
-        addToList ,
-        book_counts       
-    } = props
-
-    console.log(book_counts)
+        addToList,                       
+    } = props  
 
     return(
         <>

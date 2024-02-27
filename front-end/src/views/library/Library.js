@@ -6,16 +6,22 @@ const Library = ()=>{
     const [page_tab, setTabs] = useState(0)
     const [bookList,setBookList] = useState([])
 
-    const [form,setForm] = useState({
-        book_name:"",
-        author:""
-    })     
+    const [form,setForm] = useState(
+        {
+            book_name:"",
+            author:""
+        }
+    )     
 
     useEffect(()=>{
-        console.log(form)
+        fetchData()
+    },[])
+
+    useEffect(()=>{
+        //console.log(form)
     },[form])
 
-    
+        
     function updateForm(key,e){
         const value = e.target.value;
         setForm({
@@ -24,20 +30,9 @@ const Library = ()=>{
         })
     }
 
-    function addToList(){
-        var _tempbookList = bookList
-        _tempbookList.push(form)
-        setForm({
-            book_name:"",
-            author:""
-        })
-        setBookList(_tempbookList)
-
-    }
-
     function displayBookList(){
         
-        return(<table>
+        return(<table border={1}>
             <tr>
                 <th>Book Name</th>
                 <th>Author</th>
@@ -58,10 +53,150 @@ const Library = ()=>{
         </table>)
     }
 
+    const ojtLists = [
+        {
+            name:"Josh Josh",
+            course:"Kompyuter Sayans",
+            age:"15",
+            talent:"Kumanta at drawing",
+            subjects:[{
+                subject_name: "SAD"
+            },
+            {
+                subject_name: "SIA"
+            }
+            ]
+        },
+        {
+            name:"Mar Mar",
+            course:"Kompyuter Sayans",
+            age:"8",
+            talent:"Tangled"
+        },
+        {
+            name:"Jas Jas",
+            course:"Kompyuter Sayans",
+            age:"25",
+            talent:"matulog"
+        }
+    ]
+
+   async function fetchData(){
+
+        const url = "http://localhost:5100/api/getBooks";
+        const requestOption = {
+            method: "GET",
+            headers:{
+                "Content-Type": "application/json"
+            },           
+            async: false 
+        }
+
+      
+       fetch(url, requestOption)
+        .then((response) => response.json())
+        .then((result) => 
+        {
+            console.log(result);
+            setBookList(result.payload)
+        }       
+        )
+        .catch((error) => console.error(error));
+           
+    }
+
+    async function addBooks(){
+        const url = "http://localhost:5100/api/storeBooks"
+
+
+        const reqBody = {
+            authorization:{
+
+            },
+            payload:{
+                ...form
+            }
+        }
+
+        const requestOption = {
+            method: "POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify(reqBody)
+        }
+
+        fetch(url, requestOption)
+        .then((response) => response.json())
+        .then((result) => 
+        {
+            setForm({
+                book_name:"",
+                author:""
+            })
+            fetchData()
+            console.log(result);         
+        }       
+        )
+        .catch((error) => console.error(error));
+    }
+
 
     return(
+
+        // <div className="text-center">
+        //     <table border={1}> 
+        //         <tr>
+        //             <th>Number</th>
+        //             <th>OJT NAme</th>    
+        //             <th>course</th>           
+        //             <th>age</th>  
+        //             <th>talent</th>          
+        //             <th>Subjects</th>
+        //         </tr>         
+        //         {
+        //             ojtLists?.length > 0?
+        //             <>
+        //             {
+        //                 ojtLists?.map((ojtList,ojt_index) =>{                                                          
+                               
+        //                     var to_return = []
+                         
+        //                     to_return.push(
+        //                         <tr>
+        //                             <td>{ojt_index+1}</td>
+        //                             <td>{ojtList.name}</td>
+        //                             <td>{ojtList.course}</td>
+        //                             <td>{ojtList.age}</td>
+        //                             <td>{ojtList.talent}</td>
+        //                             <td>
+        //                                 {
+        //                                     ojtList.subjects?.map((subject,subject_index)=>{
+        //                                         return(
+        //                                         <div>{subject_index+1}{".)"}{ subject.subject_name}</div>
+        //                                         )
+        //                                     })
+        //                                 }
+        //                             </td>
+        //                         </tr>
+        //                     )
+
+        //                     return (
+        //                         to_return
+        //                     )
+        //                 })
+        //             }
+        //             </>
+        //             :
+        //             "Empty List"
+
+        //         }
+        //     </table>
+        // </div>
+
+
     <div className="ml-4">
-        This is a library 
+        <br></br>
         <br></br>
         <button onClick={()=>{setTabs(0)}}>
             Book List
@@ -80,7 +215,7 @@ const Library = ()=>{
         }
         {
              page_tab == 1?
-                <AddEditLibrary form ={form} updateForm ={updateForm} addToList = {addToList} />
+                <AddEditLibrary  form ={form} updateForm ={updateForm} addToList = {addBooks} />
                 :
                 null
 
