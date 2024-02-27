@@ -3,9 +3,11 @@ import React from "react";
 const AddEditLibrary = (props) =>{
 
     const {
+        editID,
         form,
         updateForm,
-        addToList,                       
+        addToList,   
+        editBooks,                    
     } = props  
 
     return(
@@ -26,9 +28,17 @@ const AddEditLibrary = (props) =>{
                 value={form.author}
                 onChange={(e)=>{updateForm("author",e )}}/>
             <br></br>
-            <button onClick={addToList}>
-                Add To List
-            </button>
+            {
+                editID?
+                <button onClick={editBooks}>
+                    Edit Book
+                </button>
+                :
+                <button onClick={addToList}>
+                    Add To List
+                </button>
+            }
+           
         </>
     )
 }

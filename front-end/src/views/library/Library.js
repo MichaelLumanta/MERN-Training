@@ -6,6 +6,8 @@ const Library = ()=>{
     const [page_tab, setTabs] = useState(0)
     const [bookList,setBookList] = useState([])
 
+    const [editID,setEditID] = useState(null)
+
     const [form,setForm] = useState(
         {
             book_name:"",
@@ -36,6 +38,7 @@ const Library = ()=>{
             <tr>
                 <th>Book Name</th>
                 <th>Author</th>
+                <th>Actions</th>
             </tr>
             {
                 bookList.map(element =>{
@@ -43,6 +46,20 @@ const Library = ()=>{
                         <tr>
                             <td>{element.book_name}</td>
                             <td>{element.author}</td>
+                            <td>
+                                <button onClick={()=>{
+                                    setEditID(element._id)
+                                    setForm(element)
+                                    setTabs(1)
+                                }}>
+                                    Update
+                                </button>
+                                <button className="bg-red" onClick={()=>{
+                                    deleteBook(element._id)                         
+                                }}>
+                                    Delete
+                                </button>
+                            </td>
                         </tr>
                     )
                     
@@ -141,6 +158,65 @@ const Library = ()=>{
         .catch((error) => console.error(error));
     }
 
+    function editBooks(){
+        const url = `http://localhost:5100/api/editBooks/${editID}`
+
+
+        const reqBody = {
+            authorization:{
+
+            },
+            payload:{
+                ...form
+            }
+        }
+
+        const requestOption = {
+            method: "POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify(reqBody)
+        }
+
+        fetch(url, requestOption)
+        .then((response) => response.json())
+        .then((result) => 
+        {
+            setForm({
+                book_name:"",
+                author:""
+            })
+            fetchData()
+            console.log(result);         
+        }       
+        )
+        .catch((error) => console.error(error));
+    }
+
+    function deleteBook(book_id){
+        const url = `http://localhost:5100/api/deleteBook/${book_id}`
+
+        const requestOption = {
+            method: "POST",
+            headers:{
+                "Content-Type":"application/json"
+            },          
+        }
+
+        fetch(url, requestOption)
+        .then((response) => response.json())
+        .then((result) => 
+        {
+            setForm({
+                book_name:"",
+                author:""
+            })
+            fetchData()       
+        }       
+        )
+        .catch((error) => console.error(error));
+    }
 
     return(
 
@@ -202,7 +278,7 @@ const Library = ()=>{
             Book List
         </button>
         
-        <button className="ml-2" onClick={()=>{setTabs(1)}}>
+        <button className="ml-2" onClick={()=>{setTabs(1);setEditID(null)}}>
             Add Book
         </button>
         
@@ -215,7 +291,7 @@ const Library = ()=>{
         }
         {
              page_tab == 1?
-                <AddEditLibrary  form ={form} updateForm ={updateForm} addToList = {addBooks} />
+                <AddEditLibrary  form ={form} updateForm ={updateForm} addToList = {addBooks} editID={editID} editBooks= {editBooks} />
                 :
                 null
 
